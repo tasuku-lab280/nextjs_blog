@@ -1,17 +1,35 @@
-import { Button } from '@mantine/core';
-import type { NextPage } from 'next';
+import Link from 'next/link';
+import type { GetStaticProps, NextPage } from 'next';
+import type { MicroCMSListResponse } from 'microcms-js-sdk';
 
-const handleClick = () => {
-  alert('Hello!');
+import { BaseLayout } from 'layouts/BaseLayout';
+import { client } from 'services/microcms/client';
+import type { Blog } from 'types/blog';
+
+type Props = MicroCMSListResponse<Blog>;
+
+const Home: NextPage<Props> = (props) => {
+  return (
+    <BaseLayout>
+      <ul>
+        <p>記事の総数：{props.totalCount}</p>
+        {props.contents.map((content) => (
+          <li key={content.id}>
+            <Link href={`/blog/${content.id}`}>
+              <a href="">{content.title}</a>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </BaseLayout>
+  );
 };
 
-const Home: NextPage = () => {
-  return (
-    <div>
-      <p className="text-xl font-bold">Click!</p>
-      <Button onClick={handleClick}>Greet</Button>
-    </div>
-  );
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const data = await client.getList<Blog>({ endpoint: 'blog' });
+  return {
+    props: data,
+  };
 };
 
 export default Home;
