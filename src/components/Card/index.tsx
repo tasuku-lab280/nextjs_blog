@@ -3,8 +3,10 @@ import {
   Card as MantineCard,
   Text,
   Badge,
+  Group,
   useMantineTheme,
 } from '@mantine/core';
+import { Clock } from 'tabler-icons-react';
 import dayjs from 'dayjs';
 
 type Props = {
@@ -28,7 +30,7 @@ export const Card = (props: Props) => {
           shadow="sm"
           p="lg"
           radius="md"
-          className="bg-gray-800 hover:bg-gray-700"
+          className="hover:bg-zinc-700"
         >
           <MantineCard.Section>
             <Badge color="pink" variant="light" className="mt-5 ml-5">
@@ -42,11 +44,12 @@ export const Card = (props: Props) => {
             </Text>
           </div>
 
-          <Text size="sm" style={{ color: secondaryColor, lineHeight: 1.5 }}>
-            <time dateTime={publishedAt}>
+          <Group>
+            <Clock size={15} />
+            <Text size="sm" style={{ color: secondaryColor, lineHeight: 1.5 }}>
               {dayjs(publishedAt).format('YYYY/MM/DD')}
-            </time>
-          </Text>
+            </Text>
+          </Group>
         </MantineCard>
       </a>
     </Link>
