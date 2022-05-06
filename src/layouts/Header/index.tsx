@@ -1,36 +1,55 @@
+import { useState } from 'react';
 import {
   createStyles,
   Header as MantineHeader,
-  Autocomplete,
+  Container,
   Group,
   Burger,
+  Paper,
+  Transition,
 } from '@mantine/core';
 import { useBooleanToggle } from '@mantine/hooks';
-import { Search } from 'tabler-icons-react';
-
 import { MantineLogo } from './Logo';
 
+const HEADER_HEIGHT = 60;
+
 const useStyles = createStyles((theme) => ({
-  header: {
-    paddingLeft: theme.spacing.md,
-    paddingRight: theme.spacing.md,
+  root: {
+    position: 'relative',
+    zIndex: 1,
   },
 
-  inner: {
-    height: 56,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  dropdown: {
+    position: 'absolute',
+    top: HEADER_HEIGHT,
+    left: 0,
+    right: 0,
+    zIndex: 0,
+    borderTopRightRadius: 0,
+    borderTopLeftRadius: 0,
+    borderTopWidth: 0,
+    overflow: 'hidden',
 
-  links: {
-    [theme.fn.smallerThan('md')]: {
+    [theme.fn.largerThan('sm')]: {
       display: 'none',
     },
   },
 
-  search: {
-    [theme.fn.smallerThan('xs')]: {
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '100%',
+  },
+
+  links: {
+    [theme.fn.smallerThan('sm')]: {
+      display: 'none',
+    },
+  },
+
+  burger: {
+    [theme.fn.largerThan('sm')]: {
       display: 'none',
     },
   },
@@ -54,57 +73,75 @@ const useStyles = createStyles((theme) => ({
           ? theme.colors.dark[6]
           : theme.colors.gray[0],
     },
+
+    [theme.fn.smallerThan('sm')]: {
+      borderRadius: 0,
+      padding: theme.spacing.md,
+    },
+  },
+
+  linkActive: {
+    '&, &:hover': {
+      backgroundColor:
+        theme.colorScheme === 'dark'
+          ? theme.fn.rgba(theme.colors[theme.primaryColor][9], 0.25)
+          : theme.colors[theme.primaryColor][0],
+      color:
+        theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 3 : 7],
+    },
   },
 }));
 
+const links = [
+  { label: 'Blog', link: '/' },
+  { label: 'Profile', link: '/profile' },
+];
+
 export const Header = () => {
   const [opened, toggleOpened] = useBooleanToggle(false);
-  const { classes } = useStyles();
-
-  const links = [
-    { label: 'ブログ', link: '/' },
-    { label: 'プロフィール', link: '/' },
-  ];
+  const [active, setActive] = useState(links[0].link);
+  const { classes, cx } = useStyles();
 
   const items = links.map((link) => (
     <a
       key={link.label}
       href={link.link}
-      className={classes.link}
-      onClick={(event) => event.preventDefault()}
+      className={cx(classes.link, {
+        [classes.linkActive]: active === link.link,
+      })}
+      onClick={(event) => {
+        event.preventDefault();
+        setActive(link.link);
+        toggleOpened(false);
+      }}
     >
       {link.label}
     </a>
   ));
 
   return (
-    <MantineHeader height={56} className={classes.header}>
-      <div className={classes.inner}>
-        <Group>
-          <Burger opened={opened} onClick={() => toggleOpened()} size="sm" />
-          <MantineLogo />
+    <MantineHeader height={HEADER_HEIGHT} className={classes.root}>
+      <Container className={classes.header}>
+        <MantineLogo />
+        <Group spacing={5} className={classes.links}>
+          {items}
         </Group>
 
-        <Group>
-          <Group ml={50} spacing={5} className={classes.links}>
-            {items}
-          </Group>
-          <Autocomplete
-            className={classes.search}
-            placeholder="Search"
-            icon={<Search size={16} />}
-            data={[
-              'React',
-              'Angular',
-              'Vue',
-              'Next.js',
-              'Riot.js',
-              'Svelte',
-              'Blitz.js',
-            ]}
-          />
-        </Group>
-      </div>
+        <Burger
+          opened={opened}
+          onClick={() => toggleOpened()}
+          className={classes.burger}
+          size="sm"
+        />
+
+        <Transition transition="pop-top-right" duration={200} mounted={opened}>
+          {(styles) => (
+            <Paper className={classes.dropdown} withBorder style={styles}>
+              {items}
+            </Paper>
+          )}
+        </Transition>
+      </Container>
     </MantineHeader>
   );
 };

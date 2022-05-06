@@ -1,7 +1,8 @@
-import Link from 'next/link';
 import type { GetStaticProps, NextPage } from 'next';
 import type { MicroCMSListResponse } from 'microcms-js-sdk';
+import { Grid } from '@mantine/core';
 
+import { Card } from 'components/Card';
 import { BaseLayout } from 'layouts/BaseLayout';
 import { client } from 'services/microcms/client';
 import type { Blog } from 'types/blog';
@@ -11,16 +12,19 @@ type Props = MicroCMSListResponse<Blog>;
 const Home: NextPage<Props> = (props) => {
   return (
     <BaseLayout>
-      <ul>
-        <p>記事の総数：{props.totalCount}</p>
+      <Grid>
         {props.contents.map((content) => (
-          <li key={content.id}>
-            <Link href={`/blog/${content.id}`}>
-              <a href="">{content.title}</a>
-            </Link>
-          </li>
+          <Grid.Col key={content.id} span={12} sm={6}>
+            <Card
+              title={content.title}
+              image={content.image.url}
+              publishedAt={content.publishedAt}
+              category={content.category.name}
+              link={`/blog/${content.id}`}
+            />
+          </Grid.Col>
         ))}
-      </ul>
+      </Grid>
     </BaseLayout>
   );
 };

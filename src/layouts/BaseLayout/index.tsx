@@ -1,4 +1,5 @@
 import { Container } from '@mantine/core';
+
 import { Header } from 'layouts/Header';
 
 type Props = {
@@ -9,7 +10,9 @@ export const BaseLayout = ({ children }: Props) => {
   return (
     <>
       <Header></Header>
-      <Container size="xl">{children}</Container>
+      <Container size="md" mt={40}>
+        {children}
+      </Container>
     </>
   );
 };
